@@ -64,8 +64,17 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   echo \#define UTS_VERSION \"`echo $UTS_VERSION | $UTS_TRUNCATE`\"
 
   echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
-  echo \#define LINUX_COMPILE_BY \"`whoami`\"
-  echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
+  if [ -z "$KBUILD_BUILD_USER" ]; then
+    echo \#define LINUX_COMPILE_BY \"`whoami`\"
+  else
+    echo \#define LINUX_COMPILE_BY \"$KBUILD_BUILD_USER\"
+  fi
+
+  if [ -z "$KBUILD_BUILD_HOST" ]; then
+    echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
+  else
+    echo \#define LINUX_COMPILE_HOST \"$KBUILD_BUILD_HOST\"
+  fi
 
   domain=`dnsdomainname 2> /dev/null`
   if [ -z "$domain" ]; then
