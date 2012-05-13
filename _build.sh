@@ -156,7 +156,7 @@ echo "  $OUTPUT_DIR/$BUILD_LOCALVERSION-signed.zip"
 
 # rename zImage for multiboot
 if [ "$BUILD_TARGET" = "MULTI" ]; then
-    echo "  rename $OUTPUT_DIR/zImage => $OUTPUT_DIR/zImage_db"
+    echo "  rename $OUTPUT_DIR/zImage => $OUTPUT_DIR/zImage_gb"
     cp zImage zImage_gb
 fi
 
