@@ -602,6 +602,12 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
 KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
 
 # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
+
+# check user boot splash
+ifeq ($(USER_BOOT_SPLASH),y)
+	KBUILD_CFLAGS  += -DUSER_BOOT_SPLASH
+endif
+
 # But warn user when we do so
 warn-assign = \
 $(warning "WARNING: Appending $$K$(1) ($(K$(1))) from $(origin K$(1)) to kernel $$$(1)")
