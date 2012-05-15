@@ -1299,6 +1299,7 @@ static struct max8997_regulator_data max8997_regulators[] = {
 #endif /* CONFIG_MACH_Q1_REV02 */
 };
 
+/*
 static int max8997_power_set_charger(int insert)
 {
 	struct power_supply *psy = power_supply_get_by_name("battery");
@@ -1316,6 +1317,7 @@ static int max8997_power_set_charger(int insert)
 
 	return psy->set_property(psy, POWER_SUPPLY_PROP_ONLINE, &value);
 }
+*/
 
 static struct max8997_power_data max8997_power = {
 /*	.set_charger = max8997_power_set_charger,	*/
@@ -4956,7 +4958,7 @@ static struct sec_jack_zone sec_jack_zones[] = {
 		 * stays in this range for 100ms (10ms delays, 10 samples)
 		 */
 		.adc_high = 3800,
-#if CONFIG_MACH_Q1_REV02
+#ifdef CONFIG_MACH_Q1_REV02
 		.delay_ms = 15,
 		.check_count = 20,
 #else
