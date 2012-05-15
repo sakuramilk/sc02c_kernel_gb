@@ -2826,7 +2826,11 @@ static int __init lcdtype_setup(char *str)
 	get_option(&str, &lcdtype);
 	return 1;
 }
+#if defined(CONFIG_TARGET_LOCALE_NTT)
+__setup("ld9040.get_lcdtype=", lcdtype_setup);
+#else
 __setup("lcdtype=", lcdtype_setup);
+#endif
 
 #ifdef CONFIG_FB_S3C_LD9040
 #ifndef LCD_ON_FROM_BOOTLOADER
