@@ -77,6 +77,7 @@ sio_add_request(struct request_queue *q, struct request *rq)
 	list_add_tail(&rq->queuelist, &sd->fifo_list[sync]);
 }
 
+#if 0
 static int
 sio_queue_empty(struct request_queue *q)
 {
@@ -86,6 +87,7 @@ sio_queue_empty(struct request_queue *q)
 	return list_empty(&sd->fifo_list[SYNC]) &&
 	       list_empty(&sd->fifo_list[ASYNC]);
 }
+#endif
 
 static struct request *
 sio_expired_request(struct sio_data *sd, int sync)

@@ -159,6 +159,7 @@ static void mali_pm_late_resume(struct early_suspend *mali_dev);
 #endif /* CONFIG_HAS_EARLYSUSPEND */
 
 #ifndef CONFIG_HAS_EARLYSUSPEND
+#ifndef CONFIG_PM_RUNTIME
 /* OS suspend and resume callbacks */
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(LINUX_KERNEL_MAJOR_VERSION,LINUX_KERNEL_MINOR_VERSION,LINUX_KERNEL_DEVELOPMENT_VERSION))
 static int mali_pm_os_suspend(struct platform_device *pdev, pm_message_t state);
@@ -171,6 +172,7 @@ static int mali_pm_os_resume(struct platform_device *pdev);
 #else
 static int mali_pm_os_resume(struct device *dev);
 #endif
+#endif //CONFIG_PM_RUNTIME
 #endif //CONFIG_HAS_EARLYSUSPEND
 
 /* OS Hibernation suspend callback */

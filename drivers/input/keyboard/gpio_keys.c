@@ -342,7 +342,7 @@ static ssize_t key_pressed_show(struct device *dev,
 
 /* the volume keys can be the wakeup keys in special case */
 static ssize_t wakeup_enable(struct device *dev,
-	struct device_attribute *attr, char *buf, size_t count)
+	struct device_attribute *attr, const char *buf, size_t count)
 {
 	struct gpio_keys_drvdata *ddata = dev_get_drvdata(dev);
 	int n_events = get_n_events_by_type(EV_KEY);

@@ -288,6 +288,14 @@ int fsd_write(j4fs_ctrl *ctl)
 	j4fs_header *header = 0;
 	int ret=-1;
 
+#ifdef J4FS_TRANSACTION_LOGGING
+#ifdef __KERNEL__
+	j4fs_transaction *transaction;
+#else
+	BYTE buf1[J4FS_TRANSACTION_SIZE];
+#endif
+#endif
+
 #ifdef __KERNEL__
 	BYTE *buf;
 	buf=kmalloc(J4FS_BASIC_UNIT_SIZE,GFP_NOFS);
@@ -297,10 +305,8 @@ int fsd_write(j4fs_ctrl *ctl)
 
 #ifdef J4FS_TRANSACTION_LOGGING
 #ifdef __KERNEL__
-	j4fs_transaction *transaction;
 	transaction=kmalloc(J4FS_TRANSACTION_SIZE,GFP_NOFS);
 #else
-	BYTE buf1[J4FS_TRANSACTION_SIZE];
 	j4fs_transaction *transaction=(j4fs_transaction *)buf1;
 #endif
 #endif
@@ -1255,6 +1261,14 @@ int fsd_reclaim()
 	int ret=-1;
 	int first_unused_area_offset=0xffffffff;
 
+#ifdef J4FS_TRANSACTION_LOGGING
+#ifdef __KERNEL__
+	j4fs_transaction *transaction;
+#else
+	BYTE buf[J4FS_TRANSACTION_SIZE];
+#endif
+#endif
+
 #ifdef __KERNEL__
 	BYTE *buf_mst, *buf_header, *buf_data;
 	buf_mst=kmalloc(J4FS_BASIC_UNIT_SIZE,GFP_NOFS);
@@ -1267,10 +1281,8 @@ int fsd_reclaim()
 
 #ifdef J4FS_TRANSACTION_LOGGING
 #ifdef __KERNEL__
-	j4fs_transaction *transaction;
 	transaction=kmalloc(J4FS_TRANSACTION_SIZE,GFP_NOFS);
 #else
-	BYTE buf[J4FS_TRANSACTION_SIZE];
 	j4fs_transaction *transaction=(j4fs_transaction *)buf;
 #endif
 #endif

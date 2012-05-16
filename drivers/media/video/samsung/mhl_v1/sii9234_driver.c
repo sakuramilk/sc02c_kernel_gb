@@ -1416,6 +1416,7 @@ void	SwitchToD3( void )
 
 }
 
+#if 0
 /*===========================================================================
   FUNCTION For_check_resen_int
 
@@ -1527,6 +1528,7 @@ WriteByteTPI(TPI_INTERRUPT_ENABLE_REG, 0x02);
   //ReadModifyWriteTPI(TPI_INTERRUPT_ENABLE_REG, 0x03, 	0x03);	 //enable HPD and RSEN interrupt
   
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////////////
