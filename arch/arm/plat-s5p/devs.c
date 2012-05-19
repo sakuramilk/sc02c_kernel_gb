@@ -984,14 +984,12 @@ static char *usb_functions_mtp_acm[] = {
 	"acm",
 };
 #    endif
-#    ifdef CONFIG_USB_ANDROID_SAMSUNG_KIES_UMS
 /* debug mode : using MS Composite*/
 static char *usb_functions_ums_acm_adb[] = {
 	"usb_mass_storage",
 	"acm",
 	"adb",
 };
-#    endif
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_MTP_ADB
 /* debug mode : using MS Composite : ACM,MTP,ADB*/
 /* Usb connecting concept change ( adb with mtp )*/
