@@ -89,6 +89,9 @@
 #if defined(CONFIG_TARGET_LOCALE_NA)
 static int is_default_esn;
 #endif
+#ifdef CONFIG_FEATURE_TGS2
+static int fake_cable_type;
+#endif
 
 /* MAX8997 MUIC CHG_TYP setting values */
 enum {
@@ -502,6 +505,26 @@ static ssize_t esn_store(struct device *dev,
 }
 #endif
 
+#ifdef CONFIG_FEATURE_TGS2
+static ssize_t max8997_muic_show_fake_cable_type(struct device *dev,
+				struct device_attribute *attr, char *buf)
+{
+	pr_info("[%s] show fake_cable_type=%d\n", __func__, fake_cable_type);
+	return sprintf(buf, "%d\n", fake_cable_type);
+}
+
+static ssize_t max8997_muic_set_fake_cable_type(struct device *dev,
+				    struct device_attribute *attr,
+				    const char *buf, size_t count)
+{
+	int value;
+	sscanf(buf, "%d", &value);
+	pr_info("[%s] set fake_cable_type=%d\n", __func__, value);
+	fake_cable_type = value;
+	return count;
+}
+#endif
+
 static DEVICE_ATTR(usb_state, S_IRUGO, max8997_muic_show_usb_state, NULL);
 static DEVICE_ATTR(device, S_IRUGO, max8997_muic_show_device, NULL);
 static DEVICE_ATTR(usb_sel, 0664,
@@ -517,6 +540,10 @@ static DEVICE_ATTR(adc_debounce_time, 0664,
 #if defined(CONFIG_TARGET_LOCALE_NA)
 static DEVICE_ATTR(esn, 0664, esn_show, esn_store);
 #endif
+#ifdef CONFIG_FEATURE_TGS2
+static DEVICE_ATTR(fake_cable_type, 0666,
+		max8997_muic_show_fake_cable_type, max8997_muic_set_fake_cable_type);
+#endif
 
 static struct attribute *max8997_muic_attributes[] = {
 	&dev_attr_usb_state.attr,
@@ -528,6 +555,9 @@ static struct attribute *max8997_muic_attributes[] = {
 	&dev_attr_adc_debounce_time.attr,
 #if defined(CONFIG_TARGET_LOCALE_NA)
 	&dev_attr_esn.attr,
+#endif
+#ifdef CONFIG_FEATURE_TGS2
+	&dev_attr_fake_cable_type.attr,
 #endif
 	NULL
 };
@@ -929,6 +959,24 @@ static int max8997_muic_handle_attach(struct max8997_muic_info *info,
 			return 0;
 		}
 	}
+
+#ifdef CONFIG_FEATURE_TGS2
+	printk(KERN_INFO "[max8997] info->cable_type=%d, adc=%d, adclow=%d, adcerr=%d, chgtyp=%d",
+												info->cable_type, adc, adclow, adcerr, chgtyp);
+
+	if (adc == ADC_CEA936ATYPE1_CHG ||
+		adc == ADC_CEA936ATYPE2_CHG ||
+		adc == ADC_OPEN) {
+		switch (fake_cable_type) {
+		case CABLE_TYPE_DESKDOCK:
+			adc = ADC_DESKDOCK;
+			break;
+		case CABLE_TYPE_CARDOCK:
+			adc = ADC_CARDOCK;
+			break;
+		}
+	}
+#endif
 
 	if (info->cable_type == CABLE_TYPE_DESKDOCK && adc != ADC_DESKDOCK) {
 		dev_warn(info->dev, "%s: assume deskdock detach\n", __func__);
@@ -1411,7 +1459,9 @@ static int __devinit max8997_muic_probe(struct platform_device *pdev)
 	info->irq_adcerr = max8997->irq_base + MAX8997_IRQ_ADCERR;
 	info->muic_data = pdata->muic;
 	info->cable_type = CABLE_TYPE_UNKNOWN;
-
+#ifdef CONFIG_FEATURE_TGS2
+	fake_cable_type = CABLE_TYPE_UNKNOWN;
+#endif
 	info->muic_data->sw_path = AP_USB_MODE;
 
 	platform_set_drvdata(pdev, info);
@@ -1493,6 +1543,13 @@ static int __devinit max8997_muic_probe(struct platform_device *pdev)
 	if (device_create_file(switch_dev, &dev_attr_esn) < 0) {
 		dev_err(&pdev->dev, "%s: failed to create file(%s)\n", __func__,
 				dev_attr_esn.attr.name);
+		goto fail;
+	}
+#endif
+#ifdef CONFIG_FEATURE_TGS2
+	if (device_create_file(switch_dev, &dev_attr_fake_cable_type) < 0) {
+		dev_err(&pdev->dev, "%s: failed to create file(%s)\n", __func__,
+				dev_attr_fake_cable_type.attr.name);
 		goto fail;
 	}
 #endif
