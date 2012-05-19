@@ -60,6 +60,11 @@
 #define LOGO_MEM_BASE		        (LPDDR1_BASE_ADDR + 0x0EC00000)	/* 0x5EC00000 from Bootloader */
 #endif
 
+#if defined(CONFIG_FEATURE_TGS2) && defined(CONFIG_FB_S3C_MDNIE)
+bool s3cfb_mdnie_force_disable;
+bool s3cfb_mdnie_suspended;
+#endif
+
 struct s3cfb_fimd_desc		*fbfimd;
 
 inline struct s3cfb_global *get_fimd_global(int id)
@@ -284,9 +289,18 @@ static int s3cfb_sysfs_store_mdnie_power(struct device *dev,
 	u32 reg, i, enable;
 	struct s3cfb_global *fbdev[2];
 
+#ifdef CONFIG_FEATURE_TGS2
+	if (s3cfb_mdnie_suspended)
+		return len;
+#endif
+
 	sscanf(buf, "%d", &enable);
 
+#ifdef CONFIG_FEATURE_TGS2
+	if (enable && (s3cfb_mdnie_force_disable == false)) {
+#else
 	if (enable) {
+#endif
 		for (i = 0; i < FIMD_MAX; i++) {
 			fbdev[i] = fbfimd->fbdev[i];
 			reg = readl(S3C_VA_SYS + 0x0210);
@@ -504,6 +518,29 @@ void set_qos(void)
 }
 #endif
 
+#if defined(CONFIG_FEATURE_TGS2) && defined(CONFIG_FB_S3C_MDNIE)
+static int s3cfb_sysfs_show_mdnie_force_disable(struct device *dev,
+				struct device_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%d\n", s3cfb_mdnie_force_disable);
+}
+
+static int s3cfb_sysfs_store_mdnie_force_disable(struct device *dev,
+				struct device_attribute *attr,
+				const char *buf, size_t len)
+{
+	int value;
+
+	sscanf(buf, "%d", &value);
+	s3cfb_mdnie_force_disable = value ? true : false;
+
+	return len;
+}
+static DEVICE_ATTR(mdnie_force_disable, 0664,
+	s3cfb_sysfs_show_mdnie_force_disable, s3cfb_sysfs_store_mdnie_force_disable);
+
+#endif /* defined(CONFIG_FEATURE_TGS2) && defined(CONFIG_FB_S5P_MDNIE) */
+
 static int s3cfb_probe(struct platform_device *pdev)
 {
 	struct s3c_platform_fb *pdata = NULL;
@@ -680,6 +717,13 @@ static int s3cfb_probe(struct platform_device *pdev)
 	ret = device_create_file(&(pdev->dev), &dev_attr_mdnie_power);
 	if (ret < 0)
 		dev_err(fbdev[0]->dev, "failed to add sysfs entries : mdnie_power\n");
+#ifdef CONFIG_FEATURE_TGS2
+	s3cfb_mdnie_force_disable = false;
+	s3cfb_mdnie_suspended = false;
+	ret = device_create_file(&(pdev->dev), &dev_attr_mdnie_force_disable);
+	if (ret < 0)
+		dev_err(fbdev[0]->dev, "failed to add sysfs entries : mdnie_force_disable\n");
+#endif
 
 	init_mdnie_class();
 #endif
@@ -842,6 +886,10 @@ void s3cfb_early_suspend(struct early_suspend *h)
 
 	printk("+%s\n", __func__);
 
+#ifdef CONFIG_FEATURE_TGS2
+	s3cfb_mdnie_suspended = true;
+#endif
+
 #ifdef CONFIG_FB_S3C_S6E8AA0
 	s6e8ax0_early_suspend();
 #endif
@@ -994,6 +1042,23 @@ void s3cfb_late_resume(struct early_suspend *h)
 #ifdef CONFIG_FB_S3C_S6E8AA0
 	s6e8ax0_late_resume();
 #endif
+
+#if defined(CONFIG_FEATURE_TGS2) && defined(CONFIG_FB_S5P_MDNIE)
+	if (s3cfb_mdnie_force_disable) {
+		for (i = 0; i < FIMD_MAX; i++) {
+			fbdev[i] = fbfimd->fbdev[i];
+			writel(0, fbdev[i]->regs + 0x27c);
+			msleep(20);
+			reg = readl(S3C_VA_SYS + 0x0210);
+			reg |= (1<<1);
+			writel(reg, S3C_VA_SYS + 0x0210);
+			s3c_mdnie_stop();
+			s3c_mdnie_off();
+		}
+	}
+
+	s3cfb_mdnie_suspended = false;
+#endif /* defined(CONFIG_FEATURE_TGS2) && (CONFIG_FB_S5P_MDNIE) */
 
 	printk("-%s\n", __func__);
 
