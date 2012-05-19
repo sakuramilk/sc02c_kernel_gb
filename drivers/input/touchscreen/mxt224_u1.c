@@ -1705,6 +1705,11 @@ static ssize_t qt602240_object_show(struct device *dev,
 	return count;
 }
 
+int get_tsp_status(void)
+{
+	return touch_is_pressed;
+}
+
 struct device *sec_touchscreen;
 struct device *qt602240_noise_test;
 /*
