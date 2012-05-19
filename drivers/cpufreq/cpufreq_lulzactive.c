@@ -1013,13 +1013,14 @@ static void lulzactive_early_suspend(struct early_suspend *handler) {
 		LOGI("%s\n", __func__);
 		
 		pcpu = &per_cpu(cpuinfo, 0);
+		if (pcpu && pcpu->policy) {
+			min_freq = pcpu->policy->min;
 		
-		min_freq = pcpu->policy->min;
+			max_freq = min(pcpu->policy->max, pcpu->freq_table[screen_off_min_step].frequency);
+			max_freq = max(max_freq, min_freq);
 		
-		max_freq = min(pcpu->policy->max, pcpu->freq_table[screen_off_min_step].frequency);
-		max_freq = max(max_freq, min_freq);
-		
-		LOGI("lock @%u~@%uMHz\n", min_freq / 1000, max_freq / 1000);
+			LOGI("lock @%u~@%uMHz\n", min_freq / 1000, max_freq / 1000);
+		}
 	}
 }
 
