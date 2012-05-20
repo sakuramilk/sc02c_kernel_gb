@@ -12,7 +12,7 @@ if [ ! -n "`git status | grep clean`" ]; then
   echo 'error: sc02c_initramfs is not clean'
   exit -1
 fi
-git checkout ics
+git checkout gingerbread
 cd $KERNEL_DIR
 
 read -p "select build type? [(r)elease/(n)ightly] " BUILD_TYPE
@@ -47,7 +47,7 @@ cp -v ./out/AOSP/bin/* $RELEASE_DIR/AOSP
 # build for multiboot
 
 cd ../sc02c_initramfs
-git checkout ics_multiboot
+git checkout gingerbread-multiboot
 cd $KERNEL_DIR
 bash ./build-multi.sh a $1
 if [ $? != 0 ]; then
