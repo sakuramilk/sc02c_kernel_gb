@@ -476,6 +476,9 @@ static struct s3c2410_uartcfg smdkc210_uartcfgs[] __initdata = {
 		.ulcon		= SMDKC210_ULCON_DEFAULT,
 		.ufcon		= SMDKC210_UFCON_DEFAULT,
 		.cfg_gpio	= s3c_setup_uart_cfg_gpio,
+#ifdef CONFIG_FEATURE_AOSP
+		.wake_peer	= c1_bt_uart_wake_peer,
+#endif
 	},
 	[1] = {
 		.hwport		= 1,
@@ -6202,6 +6205,8 @@ static void __init smdkc210_machine_init(void)
 	s3c_usb_set_serial();
 /* Changes value of nluns in order to use external storage */
 	usb_device_init();
+#else
+    s3c_usb_otg_composite_pdata(&fb_platform_data);
 #endif
 
 /* klaatu: semaphore logging code - for debug  */

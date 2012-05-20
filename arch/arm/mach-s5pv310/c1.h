@@ -5,6 +5,11 @@
 #ifndef __C1_H__
 #define __C1_H__
 
+#ifdef CONFIG_FEATURE_AOSP
+struct uart_port;
+extern void c1_bt_uart_wake_peer(struct uart_port *port);
+#endif
+
 extern struct ld9040_panel_data c1_panel_data;
 extern struct ld9040_panel_data c1_panel_data_a2;
 extern struct ld9040_panel_data c1_panel_data_m2;

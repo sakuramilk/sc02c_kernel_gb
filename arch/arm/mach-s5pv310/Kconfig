@@ -614,6 +614,14 @@ menuconfig GPS_GLONASS
 
 endif
 
+menu "CPUFreq overclock"
+config FREQ_OVERCLOCK
+	bool "Frequecy overclock"
+	default n
+	help
+	 This option makes to overclock frequecy.
+endmenu
+
 menu "Build target"
 choice
 	prompt "Build target"
