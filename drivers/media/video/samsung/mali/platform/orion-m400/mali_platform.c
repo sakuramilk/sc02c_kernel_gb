@@ -361,7 +361,7 @@ _mali_osk_errcode_t mali_platform_init(_mali_osk_resource_t *resource)
 	MALI_CHECK(init_mali_clock(), _MALI_OSK_ERR_FAULT);
 #if MALI_DVFS_ENABLED
 	if (!clk_register_map) clk_register_map = _mali_osk_mem_mapioregion( CLK_DIV_STAT_G3D, 0x20, CLK_DESC );
-	if(!init_mali_dvfs_staus(MALI_DVFS_DEFAULT_STEP))
+	if(!init_mali_dvfs_status(MALI_DVFS_DEFAULT_STEP))
 		MALI_DEBUG_PRINT(1, ("mali_platform_init failed\n"));        
 #endif
 
@@ -373,7 +373,7 @@ _mali_osk_errcode_t mali_platform_deinit(_mali_osk_resource_type_t *type)
 	deinit_mali_clock();
 
 #if MALI_DVFS_ENABLED
-	deinit_mali_dvfs_staus();
+	deinit_mali_dvfs_status();
 	if (clk_register_map )
 	{	
 		_mali_osk_mem_unmapioregion(CLK_DIV_STAT_G3D, 0x20, clk_register_map);
