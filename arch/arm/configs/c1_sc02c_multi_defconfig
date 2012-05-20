@@ -469,6 +469,11 @@ CONFIG_FREQ_STEP_UP_L2_L0=y
 # CONFIG_GPS_GLONASS is not set
 
 #
+# CPUFreq overclock
+#
+# CONFIG_FREQ_OVERCLOCK is not set
+
+#
 # Build target
 #
 # CONFIG_BUILD_TARGET_SAMSUNG is not set
