@@ -1331,7 +1331,6 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 static void init_hw(void)
 {
 	gpio_direction_output(_3_GPIO_TOUCH_EN, 1);
-	touchkey_ldo_on(1);	// touch ldo on.
 	msleep(200);
 	s3c_gpio_setpull(_3_GPIO_TOUCH_INT, S3C_GPIO_PULL_NONE);
 	set_irq_type(IRQ_TOUCH_INT, IRQF_TRIGGER_FALLING);
@@ -1631,15 +1630,6 @@ static DEVICE_ATTR(touchkey_bln_control, S_IWUGO, NULL, touchkey_bln_control);
 static int __init touchkey_init(void)
 {
 	int ret = 0;
-	
-	if (gpio_request(_3_TOUCH_SDA_28V, "_3_TOUCH_SDA_28V"))
-		WARN(1, "Fail to request gpio (_3_TOUCH_SDA_28V)\n");
-	if (gpio_request(_3_TOUCH_SCL_28V, "_3_TOUCH_SCL_28V"))
-		WARN(1, "Fail to request gpio (_3_TOUCH_SCL_28V)\n");
-	if (gpio_request(_3_GPIO_TOUCH_EN, "_3_GPIO_TOUCH_EN"))
-		WARN(1, "Fail to request gpio (_3_GPIO_TOUCH_EN)\n");
-	if (gpio_request(_3_GPIO_TOUCH_INT, "_3_GPIO_TOUCH_INT"))
-		WARN(1, "Fail to request gpio (_3_GPIO_TOUCH_INT)\n");
 
 	sec_touchkey = device_create(sec_class, NULL, 0, NULL, "sec_touchkey");
 
